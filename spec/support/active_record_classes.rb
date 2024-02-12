@@ -54,6 +54,11 @@ ActiveRecord::Schema.define do
   create_table :movies do |t|
     t.string :title
   end
+  create_table :stations do |t|
+    t.string :name
+    t.float :lat
+    t.float :lon
+  end
   create_table :restaurants do |t|
     t.string :name
     t.string :kind
@@ -180,6 +185,22 @@ class Movie < ActiveRecord::Base
   meilisearch index_uid: safe_index_uid('Movie') do
     pagination max_total_hits: 5
     typo_tolerance enabled: false
+  end
+end
+
+class Station < ActiveRecord::Base
+  include MeiliSearch::Rails
+
+  meilisearch index_uid: safe_index_uid('Station') do
+    attribute :name, :_geo
+    filterable_attributes ['_geo']
+  end
+
+  def _geo
+    {
+      lat: lat,
+      lng: lon
+    }
   end
 end
 

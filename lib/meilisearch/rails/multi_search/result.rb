@@ -28,7 +28,7 @@ module MeiliSearch
           results.each(&block)
         end
       end
-      alias each each_hit
+      alias_method :each, :each_hit
 
       def each_result
         @results.each

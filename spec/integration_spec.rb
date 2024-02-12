@@ -746,6 +746,35 @@ describe 'Movie' do
   end
 end
 
+describe 'Station' do
+  describe 'geosearch', focus: true do
+    before do
+      Station.delete_all
+      Station.clear_index!(true)
+
+      Station.create!(name: 'London Victoria', lat: 51.4947328, lon: -0.1445802)
+      Station.create!(name: "King's Cross", lat: 51.5323954, lon: -0.1230224)
+      Station.create!(name: "St Pancras International", lat: 51.5318912, lon: -0.1268506)
+
+      Station.index.wait_for_task(Station.index.tasks['results'].last['uid'])
+    end
+
+    let!(:kings_cross) { Station.find_by(name: "King's Cross")}
+    let!(:st_pancras) { Station.find_by(name: "St Pancras International")}
+
+
+    it 'filters via _geoRadius' do
+      nearby_stations = Station.search('*', filter: '_geoRadius(51.5302132, -0.1240898, 2000)')
+      expect(nearby_stations).to contain_exactly(st_pancras, kings_cross)
+    end
+
+    it 'filters via _geoRoundingBox' do
+      nearby_stations = Station.search('*', filter: '_geoBoundingBox([51.5393806, -0.1193904], [51.5293210, -0.1284289])')
+      expect(nearby_stations).to contain_exactly(st_pancras, kings_cross)
+    end
+  end
+end
+
 describe 'Kaminari' do
   before(:all) do
     require 'kaminari'
