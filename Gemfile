@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-# gem 'meilisearch', path: '../meilisearch-ruby'
+gem 'meilisearch', git: 'https://github.com/ellnix/meilisearch-ruby.git', branch: 'switch-to-http-rb'
 
 gemspec
 
